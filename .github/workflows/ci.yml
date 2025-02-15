@@ -60,7 +60,11 @@ jobs:
         with:
           repository: 'aspitek/manifests'
           token: ${{ secrets.PAT_TOKEN }}
-          
+      
+      - name: Copier le ConfigMap depuis le repo du code
+        run: |
+          # Télécharger le fichier ConfigMap depuis le repo du code
+          curl -o solfa-back/configmap.yaml https://raw.githubusercontent.com/aspitek/solfa-back/main/k8s/configmap.yaml
 
       # Modify the image in manifest.yml
       - name: Modify the image in manifest.yml
