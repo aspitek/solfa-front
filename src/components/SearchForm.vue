@@ -27,7 +27,7 @@ export default {
 
         // Méthode appelée à chaque changement de l'input
         onInputChange() {
-            if (this.query.trim() && this.query.length > 1) {
+            if (this.query.trim() && this.query !== '') {
                 // Annuler le précédent timeout si l'utilisateur tape rapidement
                 clearTimeout(this.debounceTimeout);
                 // Délai avant d'envoyer la requête
