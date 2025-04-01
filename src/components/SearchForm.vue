@@ -6,9 +6,10 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import { useSearchStore } from '../stores/searchStore';
 
-export default {
+export default defineComponent({
     name: 'SearchForm',
     data() {
         return {
@@ -27,24 +28,28 @@ export default {
 
         // Méthode appelée à chaque changement de l'input
         onInputChange() {
-            if (this.query.trim()) {
-                // Annuler le précédent timeout si l'utilisateur tape rapidement
+            // Annuler le précédent timeout si l'utilisateur tape rapidement
+            if (this.debounceTimeout !== undefined) {
                 clearTimeout(this.debounceTimeout);
+            }
+
+            if (this.query.trim()) {
                 // Délai avant d'envoyer la requête
                 this.debounceTimeout = setTimeout(() => {
                     const searchStore = useSearchStore();
-                    if(this.query !== '' || this.query !== undefined || this.query !== null) {
+                    // Vérifier à nouveau si query est non vide avant d'envoyer la requête
+                    if (this.query.trim()) {
                         searchStore.fetchResults(this.query);
                     }
                 }, 500); // Délai de 500 ms avant d'envoyer la requête
-            }else if (this.query === '') {
-                // Si l'input est vide, on peut choisir de ne rien faire ou de vider les résultats
+            } else {
+                // Si l'input est vide, vider les résultats immédiatement
                 const searchStore = useSearchStore();
                 searchStore.clearResults();
             }
         },
     },
-};
+});
 </script>
 
 <style scoped>
