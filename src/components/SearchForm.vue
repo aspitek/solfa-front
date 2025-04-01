@@ -27,13 +27,15 @@ export default {
 
         // Méthode appelée à chaque changement de l'input
         onInputChange() {
-            if (this.query.trim() && this.query !== '') {
+            if (this.query.trim()) {
                 // Annuler le précédent timeout si l'utilisateur tape rapidement
                 clearTimeout(this.debounceTimeout);
                 // Délai avant d'envoyer la requête
                 this.debounceTimeout = setTimeout(() => {
                     const searchStore = useSearchStore();
-                    searchStore.fetchResults(this.query);
+                    if(this.query !== '' || this.query !== undefined || this.query !== null){ {
+                        searchStore.fetchResults(this.query);
+                    }
                 }, 500); // Délai de 500 ms avant d'envoyer la requête
             }else if (this.query === '') {
                 // Si l'input est vide, on peut choisir de ne rien faire ou de vider les résultats
