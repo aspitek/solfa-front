@@ -3,7 +3,7 @@ name: solfa-front-ci-dev
 on:
   # Triggers the workflow on push or pull request events for branches starting with "main"
   push:
-    branches: [ "dev-" ]
+    branches: [ "dev-*" ]
 
   # Allows manual execution of the workflow from the Actions tab
   workflow_dispatch:
