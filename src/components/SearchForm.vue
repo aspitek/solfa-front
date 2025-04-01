@@ -33,7 +33,7 @@ export default {
                 // Délai avant d'envoyer la requête
                 this.debounceTimeout = setTimeout(() => {
                     const searchStore = useSearchStore();
-                    if(this.query !== '' || this.query !== undefined || this.query !== null){ {
+                    if(this.query !== '' || this.query !== undefined || this.query !== null) {
                         searchStore.fetchResults(this.query);
                     }
                 }, 500); // Délai de 500 ms avant d'envoyer la requête
