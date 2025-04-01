@@ -1,5 +1,5 @@
 # Étape 1 : Build de l'application Vue.js
-FROM node:18 AS build
+FROM node:18-alpine AS build
 
 # Définir le répertoire de travail
 WORKDIR /app
