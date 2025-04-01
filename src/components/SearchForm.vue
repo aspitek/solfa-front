@@ -5,7 +5,7 @@
     </form>
 </template>
 
-<script>
+<script lang="ts">
 import { useSearchStore } from '../stores/searchStore';
 
 export default {
@@ -13,7 +13,7 @@ export default {
     data() {
         return {
             query: '',
-            debounceTimeout: null, // Variable pour gérer le timeout
+            debounceTimeout: undefined as number | undefined, // Variable pour gérer le timeout
         };
     },
     methods: {

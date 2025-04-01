@@ -24,10 +24,21 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import SearchForm from '../components/SearchForm.vue';
 import Logo from '../components/Logo.vue';
 import { useSearchStore } from '../stores/searchStore';
+
+interface SearchResult {
+  _source: {
+    title: string;
+    composer: string;
+    category: string;
+    genre: string;
+    release_date: string;
+    path: string;
+  };
+}
 
 export default {
   name: 'HomeSearch',
@@ -37,7 +48,7 @@ export default {
   },
   data() {
     return {
-      results: [],
+      results: [] as SearchResult[],  // Spécifier le type ici
     };
   },
   computed: {
@@ -52,10 +63,10 @@ export default {
     },
   },
   methods: {
-    handleSearchResults(results) {
+    handleSearchResults(results: SearchResult[]) {  // Définir le type ici aussi
       this.results = results;
     },
-    formatDate(dateString) {
+    formatDate(dateString: string) {
       if (!dateString || dateString === '0001-01-01T00:00:00Z') {
         return 'Date inconnue';
       }
@@ -66,7 +77,7 @@ export default {
         day: 'numeric',
       });
     },
-    async downloadPartition(path, title) {
+    async downloadPartition(path: string, title: string) {  // Ajouter les types des paramètres
       try {
         // Construire l'URL de téléchargement pour le backend Go
         const downloadUrl = `http://147.79.114.72:32040/download?path=${encodeURIComponent(path)}`;
@@ -103,13 +114,14 @@ export default {
         window.URL.revokeObjectURL(url);
 
         console.log(`Partition ${title} téléchargée avec succès`);
-      } catch (error) {
+      } catch (error: unknown) {  // Traiter le type 'unknown'
         console.error('Erreur lors du téléchargement :', error);
-        alert(error.message || 'Impossible de télécharger la partition. Veuillez réessayer plus tard.');
+        alert((error as Error).message || 'Impossible de télécharger la partition. Veuillez réessayer plus tard.');
       }
     },
   },
 };
+
 </script>
 
 <style scoped>
