@@ -200,11 +200,12 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 100vh; /* Hauteur minimale */
+    min-height: 100vh; /* Hauteur minimale pour remplir l’écran */
     background-color: #f5f5f5;
-    padding: 1rem; /* Réduit pour mobile */
-    overflow-y: auto; /* Active le défilement vertical */
-    margin-top: 60px; /* Espace pour la barre de navigation fixe */
+    padding: 1rem;
+    overflow-y: auto; /* Active le défilement si le contenu dépasse */
+    margin-top: 50px; /* Ajusté pour la hauteur de la barre de navigation compacte */
+    padding-top: 5%;
 }
 
 .upload-title {
@@ -224,7 +225,7 @@ export default defineComponent({
 
 .upload-form {
     background-color: white;
-    padding: 1.5rem; /* Réduit pour gagner de l'espace */
+    padding: 1.5rem;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     width: 100%;
@@ -233,13 +234,13 @@ export default defineComponent({
 }
 
 .form-group {
-    margin-bottom: 1rem; /* Réduit pour compacter */
+    margin-bottom: 1rem;
     text-align: left;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 0.3rem; /* Réduit */
+    margin-bottom: 0.3rem;
     color: #A7B5A3;
     font-family: Arial, sans-serif;
     font-weight: bold;
@@ -248,7 +249,7 @@ export default defineComponent({
 .form-group input,
 .form-group select {
     width: 100%;
-    padding: 0.5rem; /* Réduit pour compacter */
+    padding: 0.5rem;
     border: 2px solid #F9C5B5;
     border-radius: 5px;
     font-size: 1rem;
@@ -296,11 +297,12 @@ export default defineComponent({
 @media (max-width: 600px) {
     .upload-container {
         padding: 0.5rem;
+        margin-top: 50px; /* Cohérent avec la barre compacte */
     }
 
     .upload-form {
         padding: 1rem;
-        max-width: 95%; /* Utilise presque toute la largeur */
+        max-width: 95%;
     }
 
     .upload-title {
@@ -337,8 +339,8 @@ export default defineComponent({
         padding: 0.75rem;
     }
 
-    .upload-container{
-        margin-top: 10%;
+    .upload-container {
+        margin-top: 40px; /* Ajusté pour très petits écrans */
     }
 }
 </style>

@@ -66,10 +66,10 @@ export default defineComponent({
     width: 100%;
     box-sizing: border-box;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    position: fixed; /* Fixe la barre en haut */
+    position: fixed;
     top: 0;
     left: 0;
-    z-index: 1000; /* Toujours au-dessus des autres éléments */
+    z-index: 1000;
 }
 
 .navbar-brand {
@@ -119,38 +119,51 @@ export default defineComponent({
     color: #C4827A;
 }
 
+/* Media Queries pour téléphones */
 @media (max-width: 600px) {
     .navbar {
-        padding: 0.75rem;
-        flex-direction: column;
-        gap: 0.75rem;
+        padding: 0.5rem 1rem; /* Réduit le padding */
+        flex-wrap: nowrap; /* Évite le retour à la ligne */
+        justify-content: space-between;
+    }
+
+    .navbar-brand {
+        font-size: 1.2rem; /* Réduit la taille du logo */
+        margin-right: 0.5rem; /* Espace minimal */
     }
 
     .navbar-actions {
-        width: 100%;
-        flex-direction: row;
-        gap: 0.5rem;
-        flex-wrap: wrap;
+        gap: 0.5rem; /* Réduit l’espace entre les boutons */
+        flex-grow: 1; /* Utilise l’espace disponible */
+        justify-content: flex-end; /* Aligne les boutons à droite */
     }
 
     .nav-button {
-        padding: 0.75rem 1rem;
-        font-size: 0.9rem;
-        min-height: 48px;
-        min-width: 45%;
-        flex: 1;
+        padding: 0.3rem 0.6rem; /* Réduit mais reste cliquable */
+        font-size: 0.8rem; /* Texte plus petit */
+        min-height: 36px; /* Hauteur minimale pour le tactile */
+        min-width: 70px; /* Largeur réduite */
     }
 }
 
 @media (max-width: 400px) {
+    .navbar {
+        padding: 0.3rem 0.5rem; /* Encore plus compact */
+    }
+
+    .navbar-brand {
+        font-size: 1rem; /* Plus petit */
+    }
+
     .navbar-actions {
-        flex-direction: column;
+        gap: 0.3rem; /* Encore moins d’espace */
     }
 
     .nav-button {
-        width: 100%;
-        min-width: unset;
-        padding: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        min-height: 32px; /* Minimum pour très petits écrans */
+        min-width: 60px; /* Plus compact */
     }
 }
 </style>
