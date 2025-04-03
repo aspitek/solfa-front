@@ -106,26 +106,25 @@
       <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
     </div>
-  </template>
-  
-  <script lang="ts">
-  import { defineComponent, ref } from 'vue';
-  import { useRouter } from 'vue-router';
-  import { useAuthStore } from '../stores/authStore';
-  import axios from 'axios';
-  
-  export default defineComponent({
+</template>
+
+<script lang="ts">
+// Le script reste inchangé
+import { defineComponent, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '../stores/authStore';
+import axios from 'axios';
+
+export default defineComponent({
     name: 'Upload',
     setup() {
       const router = useRouter();
       const authStore = useAuthStore();
-  
-      // Vérifier si l'utilisateur est connecté, sinon rediriger vers /login
+
       if (!authStore.isLoggedIn) {
         router.push('/login');
       }
-  
-      // Variables réactives pour les champs du formulaire
+
       const partitionFile = ref<File | null>(null);
       const title = ref<string>('');
       const composer = ref<string>('');
@@ -134,22 +133,20 @@
       const releaseDate = ref<string>('');
       const successMessage = ref<string>('');
       const errorMessage = ref<string>('');
-  
-      // Gérer le changement de fichier
+
       const handleFileChange = (event: Event) => {
         const target = event.target as HTMLInputElement;
         if (target.files && target.files.length > 0) {
           partitionFile.value = target.files[0];
         }
       };
-  
-      // Gérer l'upload de la partition
+
       const handleUpload = async () => {
         if (!partitionFile.value) {
           errorMessage.value = 'Veuillez sélectionner un fichier PDF.';
           return;
         }
-  
+
         const formData = new FormData();
         formData.append('partition_file', partitionFile.value);
         formData.append('Title', title.value);
@@ -157,7 +154,7 @@
         formData.append('Genre', genre.value);
         formData.append('Category', category.value);
         formData.append('ReleaseDate', releaseDate.value);
-  
+
         try {
           const response = await axios.post('http://147.79.114.72:32040/admin/upload', formData, {
             headers: {
@@ -165,17 +162,15 @@
               Authorization: `Bearer ${authStore.token}`,
             },
           });
-  
+
           successMessage.value = 'Partition uploadée avec succès !';
           errorMessage.value = '';
-          // Réinitialiser le formulaire
           partitionFile.value = null;
           title.value = '';
           composer.value = '';
           genre.value = '';
           category.value = '';
           releaseDate.value = '';
-          // Rediriger vers une page de liste des partitions (à créer)
           setTimeout(() => router.push('/partitions'), 2000);
         } catch (error) {
           errorMessage.value = 'Erreur lors de l\'upload de la partition. Vérifiez les champs et réessayez.';
@@ -183,7 +178,7 @@
           console.error('Erreur lors de l\'upload :', error);
         }
       };
-  
+
       return {
         partitionFile,
         title,
@@ -197,79 +192,80 @@
         handleUpload,
       };
     },
-  });
-  </script>
-  
-  <style scoped>
-  .upload-container {
+});
+</script>
+
+<style scoped>
+.upload-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 100vh;
+    min-height: 100vh; /* Hauteur minimale */
     background-color: #f5f5f5;
-    padding: 2rem;
-    padding-bottom: 25%;
-  }
-  
-  .upload-title {
-    color: #C4827A; /* Rose saumon */
+    padding: 1rem; /* Réduit pour mobile */
+    overflow-y: auto; /* Active le défilement vertical */
+    margin-top: 60px; /* Espace pour la barre de navigation fixe */
+}
+
+.upload-title {
+    color: #C4827A;
     font-family: Arial, sans-serif;
     font-weight: bold;
     font-size: 2rem;
     margin-bottom: 0.5rem;
-  }
-  
-  .upload-subtitle {
-    color: #A7B5A3; /* Vert pâle */
+}
+
+.upload-subtitle {
+    color: #A7B5A3;
     font-family: Arial, sans-serif;
     font-size: 1.1rem;
-    margin-bottom: 2rem;
-  }
-  
-  .upload-form {
+    margin-bottom: 1.5rem;
+}
+
+.upload-form {
     background-color: white;
-    padding: 2rem;
+    padding: 1.5rem; /* Réduit pour gagner de l'espace */
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 500px;
     text-align: center;
-  }
-  
-  .form-group {
-    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1rem; /* Réduit pour compacter */
     text-align: left;
-  }
-  
-  .form-group label {
+}
+
+.form-group label {
     display: block;
-    margin-bottom: 0.5rem;
-    color: #A7B5A3; /* Vert pâle */
+    margin-bottom: 0.3rem; /* Réduit */
+    color: #A7B5A3;
     font-family: Arial, sans-serif;
     font-weight: bold;
-  }
-  
-  .form-group input,
-  .form-group select {
+}
+
+.form-group input,
+.form-group select {
     width: 100%;
-    padding: 0.75rem;
-    border: 2px solid #F9C5B5; /* Pêche clair */
+    padding: 0.5rem; /* Réduit pour compacter */
+    border: 2px solid #F9C5B5;
     border-radius: 5px;
     font-size: 1rem;
     font-family: Arial, sans-serif;
     transition: border-color 0.3s ease;
-  }
-  
-  .form-group input:focus,
-  .form-group select:focus {
+}
+
+.form-group input:focus,
+.form-group select:focus {
     outline: none;
-    border-color: #C4827A; /* Rose saumon */
-  }
-  
-  .upload-button {
+    border-color: #C4827A;
+}
+
+.upload-button {
     width: 100%;
     padding: 0.75rem;
-    background-color: #A7B5A3; /* Vert pâle */
+    background-color: #A7B5A3;
     color: white;
     border: none;
     border-radius: 5px;
@@ -278,36 +274,71 @@
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s ease;
-  }
-  
-  .upload-button:hover {
-    background-color: #C4827A; /* Rose saumon */
-  }
-  
-  .success-message {
-    color: #A7B5A3; /* Vert pâle */
+}
+
+.upload-button:hover {
+    background-color: #C4827A;
+}
+
+.success-message {
+    color: #A7B5A3;
     margin-top: 1rem;
     font-family: Arial, sans-serif;
-  }
-  
-  .error-message {
-    color: #C4827A; /* Rose saumon */
+}
+
+.error-message {
+    color: #C4827A;
     margin-top: 1rem;
     font-family: Arial, sans-serif;
-  }
-  
-  @media (max-width: 600px) {
+}
+
+/* Media Queries pour petits écrans */
+@media (max-width: 600px) {
+    .upload-container {
+        padding: 0.5rem;
+    }
+
     .upload-form {
-      padding: 1.5rem;
-      max-width: 90%;
+        padding: 1rem;
+        max-width: 95%; /* Utilise presque toute la largeur */
     }
-  
+
     .upload-title {
-      font-size: 1.5rem;
+        font-size: 1.5rem;
     }
-  
+
     .upload-subtitle {
-      font-size: 1rem;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
     }
-  }
-  </style>
+
+    .form-group input,
+    .form-group select {
+        padding: 0.4rem;
+        font-size: 0.9rem;
+    }
+
+    .upload-button {
+        padding: 0.6rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .upload-title {
+        font-size: 1.25rem;
+    }
+
+    .upload-subtitle {
+        font-size: 0.85rem;
+    }
+
+    .upload-form {
+        padding: 0.75rem;
+    }
+
+    .upload-container{
+        margin-top: 10%;
+    }
+}
+</style>

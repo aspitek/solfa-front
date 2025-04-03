@@ -1,10 +1,8 @@
-<!-- src/views/HomeSearch.vue -->
 <template>
   <div class="home-search" :class="{ 'has-results': results.length }">
     <div class="content-wrapper">
       <Logo />
       <SearchForm @search-results="handleSearchResults" />
-      <!-- Liste déroulante des résultats -->
       <div v-if="results.length" class="results-dropdown">
         <div class="results-container">
           <div class="result-card" v-for="(result, index) in results" :key="index">
@@ -13,10 +11,9 @@
             <p><strong>Catégorie :</strong> {{ result._source.category || 'Non spécifiée' }}</p>
             <p><strong>Genre :</strong> {{ result._source.genre || 'Non spécifié' }}</p>
             <p><strong>Date de sortie :</strong> {{ formatDate(result._source.release_date) }}</p>
-            <!-- Boutons d'action -->
             <div class="action-buttons">
               <button @click="downloadPartition(result._source.path, result._source.title)" class="download-button">
-                Télécharger la partition
+                Télécharger
               </button>
               <button @click="deletePartition(result._source.id, index)" class="delete-button">
                 Supprimer
@@ -168,12 +165,12 @@ export default {
 <style scoped>
 .home-search {
   position: relative;
-  min-height: calc(100vh - 60px);
+  min-height: 100vh;
   width: 100vw;
   background-color: #ffffff;
-  margin: 0;
   padding: 0;
   box-sizing: border-box;
+ 
 }
 
 .content-wrapper {
@@ -184,13 +181,10 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
+  width: 90%;
   max-width: 600px;
   transition: top 0.5s ease-in-out;
-}
-
-.home-search.has-results .content-wrapper {
-  top: 60px;
+  
 }
 
 .results-dropdown {
@@ -198,7 +192,7 @@ export default {
   top: 100%;
   width: 100%;
   max-width: 700px;
-  max-height: calc(80vh - 60px);
+  max-height: 70vh;
   background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -207,10 +201,7 @@ export default {
   opacity: 0;
   transform: translateY(-10px);
   transition: opacity 0.3s ease, transform 0.3s ease;
-  margin-top: 5%;
-  padding-bottom: 30%;
-  padding-top: 2%;
-  padding-right: 2%;
+  padding: 10px;
 }
 
 .home-search.has-results .results-dropdown {
@@ -222,7 +213,6 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 10px;
 }
 
 .result-card {
@@ -237,96 +227,57 @@ export default {
   background-color: #f0f0f0;
 }
 
-.result-card h3 {
-  margin: 0 0 5px 0;
-  font-size: 1.1rem;
-  color: #333;
-}
-
-.result-card p {
-  margin: 2px 0;
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.result-card p strong {
-  color: #333;
-}
-
 .action-buttons {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-top: 10px;
 }
 
-.download-button {
-  padding: 8px 16px;
-  background-color: #db4437;
-  color: #ffffff;
-  border: none;
+.download-button, .delete-button {
+  flex: 1;
+  min-width: 120px;
+  padding: 8px;
+  text-align: center;
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
   transition: background-color 0.2s ease;
 }
 
-.download-button:hover {
-  background-color: #c1351f;
+.download-button {
+  background-color: #db4437;
+  color: #ffffff;
 }
 
 .delete-button {
-  padding: 8px 16px;
-  background-color: #ff6f61; /* Couleur corail pour le bouton de suppression */
+  background-color: #ff6f61;
   color: #ffffff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.2s ease;
 }
 
-.delete-button:hover {
-  background-color: #e65a50; /* Couleur plus foncée au survol */
-}
-
-/* Ajustement responsive */
 @media (max-width: 768px) {
   .content-wrapper {
     top: 8%;
+    margin-top: 20%;
   }
-
-  .home-search.has-results .content-wrapper {
-    top: 60px;
-  }
-
   .results-dropdown {
     width: 90vw;
-    max-height: calc(70vh - 60px);
+    max-height: 65vh;
   }
-
   .action-buttons {
     flex-direction: column;
-    gap: 8px;
   }
-
-  .download-button,
-  .delete-button {
+  .download-button, .delete-button {
     width: 100%;
   }
 }
 
 @media (max-width: 480px) {
   .content-wrapper {
-    top: 6%;
+    margin-top: 40%;
   }
-
-  .home-search.has-results .content-wrapper {
-    top: 60px;
-  }
-
   .results-dropdown {
     width: 85vw;
-    max-height: calc(65vh - 60px);
   }
 }
 </style>
