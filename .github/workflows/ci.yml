@@ -64,7 +64,7 @@ jobs:
       - name: Checkout le repo du code
         uses: actions/checkout@v4
         with:
-          repository: 'aspitek/solfa-front-develop'
+          repository: 'aspitek/solfa-front'
           token: ${{ secrets.PAT_TOKEN }}
           path: solfa-front-develop-code
   
