@@ -44,7 +44,7 @@ interface SearchResult {
     genre: string;
     release_date: string;
     path: string;
-    id: int
+    id: string;
   };
 }
 

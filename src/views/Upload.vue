@@ -47,6 +47,7 @@
           <select id="genre" v-model="genre" required>
             <option value="" disabled>Choisissez un genre</option>
             <option value="Classique">Classique</option>
+            <option value="Liturgique">Liturgique</option>
             <option value="Recueil de chant">Jazz</option>
             <option value="Animation | 4/4">Pop</option>
             <option value="Gbegbe">Rock</option>
