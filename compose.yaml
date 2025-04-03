@@ -1,0 +1,80 @@
+version: "3.8"
+services:
+  # APP
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - backend
+    networks:
+      - backend
+    ports:
+      - 5173:5173
+    volumes:
+      - .:/var/www/node/solfa
+      - /var/www/node/solfa/node_modules/
+
+
+  postgres:
+    image: postgres:14-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: solfa
+    networks:
+      - backend
+
+  backend:
+    privileged: true
+    container_name: backend
+    image: zetsu225/solfa:dev-5a265eba5f9e1026ff3bc0a64e8b0d87f3c3d847
+    depends_on:
+      - postgres
+    ports:
+      - 8080:8080
+    volumes:
+      - .docker/backend/.env.dev:/.env
+    networks:
+      - backend
+    environment:
+      DB_HOST: postgres
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: solfa
+      DB_PORT: 5432
+      ES_HOST: https://147.79.114.72:32000
+      ES_PORT: 30200
+      ES_USER: elastic
+      ES_PASSWORD: c96bZD90kO31pG3YxX5VY24a
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: solfa
+      MINIO_SECRET_KEY: solfa123
+
+  minio:
+    image: docker.io/bitnami/minio:latest
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    networks:
+      - minionetwork
+    volumes:
+      - 'minio_data:/data'
+    environment:
+      - MINIO_ROOT_USER=scottdev
+      - MINIO_ROOT_PASSWORD=Admin2021#
+
+networks:
+  backend:
+    driver: bridge
+  minionetwork:
+    driver: bridge
+
+volumes:
+  pgdata:
+  minio_data:
+    driver: local
