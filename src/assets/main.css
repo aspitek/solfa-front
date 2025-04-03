@@ -15,3 +15,25 @@ html, body {
   padding: 0;
   overflow: hidden; /* S'assurer qu'il n'y a pas de débordement */
 }
+
+/* Forcer le thème clair */
+:root {
+  --background-color: #f5f5f5; /* Fond clair */
+  --text-color: #333333; /* Texte sombre */
+  --primary-color: #C4827A; /* Vos couleurs */
+  --secondary-color: #A7B5A3;
+}
+
+/* Appliquer à tous les éléments */
+html, body, #app {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/* Désactiver prefers-color-scheme */
+@media (prefers-color-scheme: dark) {
+  html, body, #app {
+    background-color: var(--background-color);
+    color: var(--text-color);
+  }
+}
