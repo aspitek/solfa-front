@@ -177,9 +177,7 @@
   }
 
   @media (max-width: 480px) {
-  .login-container {
-    margin-top: 50%;
-  }
+
   
 }
   </style>
