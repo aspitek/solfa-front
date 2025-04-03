@@ -3,7 +3,7 @@ name: solfa-front-ci-dev
 on:
   # Triggers the workflow on push or pull request events for branches starting with "main"
   push:
-    branches: [ "main" ]
+    branches: [ "dev-*" ]
 
   # Allows manual execution of the workflow from the Actions tab
   workflow_dispatch:
@@ -61,7 +61,18 @@ jobs:
           repository: 'aspitek/manifests'
           token: ${{ secrets.PAT_TOKEN }}
           
-
+      - name: Checkout le repo du code
+        uses: actions/checkout@v4
+        with:
+          repository: 'aspitek/solfa-front'
+          token: ${{ secrets.PAT_TOKEN }}
+          path: solfa-front-code
+  
+        # Copier le ConfigMap
+      - name: Copier le ConfigMap depuis le repo du code
+        run: |
+          mkdir -p solfa-front/
+          cp solfa-front-code/k8s/configMap.yml solfa-front/configMap.yml  
       # Modify the image in manifest.yml
       - name: Modify the image in manifest.yml
         run: |
@@ -78,7 +89,8 @@ jobs:
 
           # Stage and commit changes
           git add solfa-front/manifest.yml
-          git commit -m 'Updated image to ${{ secrets.DOCKER_USERNAME }}/solfa:dev-${{ github.sha }} by GitHub Actions: Job changemanifest: ${{ github.run_number }}'
+          git add solfa-front/configMap.yml
+          git commit -am 'Updated image to ${{ secrets.DOCKER_USERNAME }}/solfa:dev-${{ github.sha }} by GitHub Actions: Job changemanifest: ${{ github.run_number }}'
 
           git push origin main
         env:
