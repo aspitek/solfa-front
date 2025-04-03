@@ -341,6 +341,8 @@ export default defineComponent({
 
     .upload-container {
         margin-top: 40px; /* Ajusté pour très petits écrans */
+        padding-top: 25%;
+        padding-bottom: 10%;
     }
 }
 </style>
