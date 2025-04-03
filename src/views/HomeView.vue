@@ -13,10 +13,15 @@
             <p><strong>Catégorie :</strong> {{ result._source.category || 'Non spécifiée' }}</p>
             <p><strong>Genre :</strong> {{ result._source.genre || 'Non spécifié' }}</p>
             <p><strong>Date de sortie :</strong> {{ formatDate(result._source.release_date) }}</p>
-            <!-- Bouton de téléchargement -->
-            <button @click="downloadPartition(result._source.path, result._source.title)" class="download-button">
-              Télécharger la partition
-            </button>
+            <!-- Boutons d'action -->
+            <div class="action-buttons">
+              <button @click="downloadPartition(result._source.path, result._source.title)" class="download-button">
+                Télécharger la partition
+              </button>
+              <button @click="deletePartition(result._source.id, index)" class="delete-button">
+                Supprimer
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -28,8 +33,10 @@
 import SearchForm from '../components/SearchForm.vue';
 import Logo from '../components/Logo.vue';
 import { useSearchStore } from '../stores/searchStore';
+import { useAuthStore } from '../stores/authStore'; // Importer le store d'authentification
 
 interface SearchResult {
+  _id: string; // Ajouter _id pour identifier la partition
   _source: {
     title: string;
     composer: string;
@@ -37,6 +44,7 @@ interface SearchResult {
     genre: string;
     release_date: string;
     path: string;
+    id: int
   };
 }
 
@@ -48,7 +56,7 @@ export default {
   },
   data() {
     return {
-      results: [] as SearchResult[],  // Spécifier le type ici
+      results: [] as SearchResult[], // Spécifier le type ici
     };
   },
   computed: {
@@ -63,7 +71,7 @@ export default {
     },
   },
   methods: {
-    handleSearchResults(results: SearchResult[]) {  // Définir le type ici aussi
+    handleSearchResults(results: SearchResult[]) {
       this.results = results;
     },
     formatDate(dateString: string) {
@@ -77,12 +85,9 @@ export default {
         day: 'numeric',
       });
     },
-    async downloadPartition(path: string, title: string) {  // Ajouter les types des paramètres
+    async downloadPartition(path: string, title: string) {
       try {
-        // Construire l'URL de téléchargement pour le backend Go
         const downloadUrl = `http://147.79.114.72:32040/download?path=${encodeURIComponent(path)}`;
-
-        // Faire une requête pour récupérer le fichier
         const response = await fetch(downloadUrl, {
           method: 'GET',
           headers: {
@@ -100,28 +105,64 @@ export default {
           }
         }
 
-        // Récupérer le fichier sous forme de blob
         const blob = await response.blob();
-
-        // Créer un lien temporaire pour le téléchargement
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `${title}.pdf`; // Nom du fichier téléchargé
+        link.download = `${title}.pdf`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
 
         console.log(`Partition ${title} téléchargée avec succès`);
-      } catch (error: unknown) {  // Traiter le type 'unknown'
+      } catch (error: unknown) {
         console.error('Erreur lors du téléchargement :', error);
         alert((error as Error).message || 'Impossible de télécharger la partition. Veuillez réessayer plus tard.');
       }
     },
+    async deletePartition(id: string, index: number) {
+      // Demander une confirmation avant de supprimer
+      const confirmDelete = window.confirm('Êtes-vous sûr de vouloir supprimer cette partition ? Cette action est irréversible.');
+      if (!confirmDelete) return;
+
+      try {
+        const authStore = useAuthStore(); // Récupérer le store d'authentification
+
+        // Vérifier si l'utilisateur est connecté
+        if (!authStore.isLoggedIn) {
+          throw new Error('Vous devez être connecté pour supprimer une partition.');
+        }
+
+        // Envoyer une requête DELETE au backend
+        const deleteUrl = `http://localhost:8080/admin/delete/${id}`; // Ajuster l'URL selon votre API
+        const response = await fetch(deleteUrl, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${authStore.token}`, // Ajouter le token pour l'authentification
+          },
+        });
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error('Partition non trouvée.');
+          } else if (response.status === 401) {
+            throw new Error('Non autorisé. Veuillez vous reconnecter.');
+          } else {
+            throw new Error('Erreur lors de la suppression de la partition.');
+          }
+        }
+
+        // Supprimer la partition de la liste des résultats localement
+        this.results.splice(index, 1);
+        alert('Partition supprimée avec succès !');
+      } catch (error: unknown) {
+        console.error('Erreur lors de la suppression :', error);
+        alert((error as Error).message || 'Impossible de supprimer la partition. Veuillez réessayer plus tard.');
+      }
+    },
   },
 };
-
 </script>
 
 <style scoped>
@@ -156,7 +197,7 @@ export default {
   position: absolute;
   top: 100%;
   width: 100%;
-  max-width: 500px;
+  max-width: 700px;
   max-height: calc(80vh - 60px);
   background-color: #ffffff;
   border-radius: 8px;
@@ -166,6 +207,10 @@ export default {
   opacity: 0;
   transform: translateY(-10px);
   transition: opacity 0.3s ease, transform 0.3s ease;
+  margin-top: 5%;
+  padding-bottom: 30%;
+  padding-top: 2%;
+  padding-right: 2%;
 }
 
 .home-search.has-results .results-dropdown {
@@ -208,8 +253,13 @@ export default {
   color: #333;
 }
 
-.download-button {
+.action-buttons {
+  display: flex;
+  gap: 10px;
   margin-top: 10px;
+}
+
+.download-button {
   padding: 8px 16px;
   background-color: #db4437;
   color: #ffffff;
@@ -222,6 +272,21 @@ export default {
 
 .download-button:hover {
   background-color: #c1351f;
+}
+
+.delete-button {
+  padding: 8px 16px;
+  background-color: #ff6f61; /* Couleur corail pour le bouton de suppression */
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+}
+
+.delete-button:hover {
+  background-color: #e65a50; /* Couleur plus foncée au survol */
 }
 
 /* Ajustement responsive */
@@ -237,6 +302,16 @@ export default {
   .results-dropdown {
     width: 90vw;
     max-height: calc(70vh - 60px);
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .download-button,
+  .delete-button {
+    width: 100%;
   }
 }
 
