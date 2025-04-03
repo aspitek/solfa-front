@@ -159,7 +159,7 @@
         formData.append('ReleaseDate', releaseDate.value);
   
         try {
-          const response = await axios.post('http://localhost:8080/admin/upload', formData, {
+          const response = await axios.post('http://147.79.114.72:32040/admin/upload', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
               Authorization: `Bearer ${authStore.token}`,

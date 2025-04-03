@@ -135,7 +135,7 @@ export default {
         }
 
         // Envoyer une requête DELETE au backend
-        const deleteUrl = `http://localhost:8080/admin/delete/${id}`; // Ajuster l'URL selon votre API
+        const deleteUrl = `http://147.79.114.72:32040/admin/delete/${id}`; // Ajuster l'URL selon votre API
         const response = await fetch(deleteUrl, {
           method: 'DELETE',
           headers: {

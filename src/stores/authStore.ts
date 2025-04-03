@@ -4,7 +4,7 @@ import { ref, computed } from 'vue';
 import axios, { AxiosError } from 'axios';
 import type { Router } from 'vue-router';
 
-const svr = 'http://localhost:8080'
+const svr = 'http://147.79.114.72:32040'
 
 declare module 'pinia' {
     export interface PiniaCustomProperties {
