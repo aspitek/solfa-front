@@ -8,7 +8,7 @@ export const useSearchStore = defineStore('search', {
   actions: {
     // Action pour effectuer une recherche et mettre à jour les résultats
     async fetchResults(query: string) {
-      const url = `http://147.79.114.72:32040/search?q=${encodeURIComponent(query)}`;
+      const url = `http://localhost:8080/search?q=${encodeURIComponent(query)}`;
       try {
         const response = await fetch(url);
         const data = await response.json();

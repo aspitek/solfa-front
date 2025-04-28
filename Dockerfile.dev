@@ -1,0 +1,25 @@
+FROM node:22-alpine AS base
+
+
+# All deps stage
+FROM base AS deps
+WORKDIR /app
+ADD package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
+
+# Preparation stage
+FROM base AS prepare
+WORKDIR /var/www/node/solfa
+
+COPY --from=deps /app/node_modules /var/www/node/solfa/node_modules
+COPY --from=base /usr/lib /usr/lib
+COPY --from=base /usr/local/share /usr/local/share
+COPY --from=base /usr/local/lib /usr/local/lib
+COPY --from=base /usr/local/include /usr/local/include
+COPY --from=base /usr/local/bin /usr/local/bin
+
+COPY docker-entrypoint.sh /usr/local/bin/app-docker-entrypoint.sh
+
+RUN chmod 755 /usr/local/bin/app-docker-entrypoint.sh
+
+ENTRYPOINT ["app-docker-entrypoint.sh"]

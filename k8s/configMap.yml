@@ -5,4 +5,5 @@ metadata:
   namespace: solfa-space
 data:
   ES_URL: "http://10.242.68.64:9202/"
+  VITE_API_BASE_URL: http://147.79.114.72:32040
 

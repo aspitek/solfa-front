@@ -1,22 +1,40 @@
 version: "3.8"
 services:
+  nginx:
+    container_name: solfa-nginx
+    restart: always
+    image: nginx:1.23-alpine
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - frontend
+    command: [nginx-debug, '-g', 'daemon off;']
+    networks:
+      - web
   # APP
   frontend:
+    container_name: solfa-frontend
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     depends_on:
       - backend
     networks:
       - backend
+      - web
     ports:
       - 5173:5173
     volumes:
       - .:/var/www/node/solfa
       - /var/www/node/solfa/node_modules/
-
+    environment:
+      VITE_API_BASE_URL: http://localhost:8080
 
   postgres:
+    container_name: solfa-db
     image: postgres:14-alpine
     ports:
       - 5432:5432
@@ -31,50 +49,99 @@ services:
 
   backend:
     privileged: true
-    container_name: backend
-    image: zetsu225/solfa:dev-5a265eba5f9e1026ff3bc0a64e8b0d87f3c3d847
+    container_name: solfa-backend
+    restart: always
+    image: zetsu225/solfa:dev-3f0bd5007ea41e1097813dbfcf6893c85c755e8c
     depends_on:
       - postgres
+      - elasticsearch
     ports:
       - 8080:8080
     volumes:
-      - .docker/backend/.env.dev:/.env
+      - .docker/elasticsearch:/root/elasticsearch:ro
+      - .docker/init-services.sh:/init-services.sh:ro
     networks:
       - backend
     environment:
-      DB_HOST: postgres
-      DB_USER: root
-      DB_PASSWORD: root
-      DB_NAME: solfa
-      DB_PORT: 5432
-      ES_HOST: https://147.79.114.72:32000
-      ES_PORT: 30200
-      ES_USER: elastic
-      ES_PASSWORD: c96bZD90kO31pG3YxX5VY24a
-      MINIO_ENDPOINT: minio:9000
-      MINIO_ACCESS_KEY: solfa
-      MINIO_SECRET_KEY: solfa123
+      - DB_HOST=solfa-db
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=solfa
+      - DB_PORT=5432
+      - ES_HOST=http://solfa-es:9200
+      - ES_USER=elastic
+      - ES_PASSWORD=elastic
+      - MINIO_ENDPOINT=solfa-minio:9000
+      - MINIO_ACCESS_KEY=solfa
+      - MINIO_SECRET_KEY=solfa123
 
   minio:
+    container_name: solfa-minio
     image: docker.io/bitnami/minio:latest
     ports:
       - '9000:9000'
       - '9001:9001'
     networks:
-      - minionetwork
+      - backend
     volumes:
       - 'minio_data:/data'
+      - .docker/.env.dev:/.env
     environment:
-      - MINIO_ROOT_USER=scottdev
-      - MINIO_ROOT_PASSWORD=Admin2021#
+      - MINIO_ROOT_USER=solfa
+      - MINIO_ROOT_PASSWORD=solfa123
+
+  elasticsearch:
+    container_name: solfa-es
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.6.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=elastic
+      - ELASTIC_USERNAME=elastic
+      - bootstrap.memory_lock=true
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"  # Port pour accéder à Elasticsearch via HTTP
+      - "9300:9300"  # Port interne pour la communication entre nœuds (utilisé dans des configurations multi-nœuds)
+    networks:
+      - backend
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+
+  services-init:
+    container_name: solfa-services
+    image: alpine:3.19
+    depends_on:
+      - elasticsearch
+      - minio
+    environment:
+      - ES_HOST=http://solfa-es:9200
+      - ES_USER=elastic
+      - ES_PASS=elastic
+      - MINIO_ENDPOINT=http://solfa-minio:9000
+      - MINIO_ACCESS_KEY=solfa
+      - MINIO_SECRET_KEY=solfa123
+      - MINIO_BUCKET=solfa
+    volumes:
+      - .docker/init-services.sh:/init.sh
+      - .docker/elasticsearch/mappings:/mappings
+    networks:
+      - backend
+    entrypoint: sh /init.sh
 
 networks:
-  backend:
+  web:
     driver: bridge
-  minionetwork:
+  backend:
     driver: bridge
 
 volumes:
   pgdata:
   minio_data:
+    driver: local
+  es_data:
     driver: local

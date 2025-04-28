@@ -3,9 +3,16 @@ const primeui = require('tailwindcss-primeui')
 export default {
   content: ["./src/**/*.{html,js,vue,ts}"],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        red: {
+          '500': 'red'
+        }
+      }
+    },
   },
   plugins: [
     primeui
   ],
+  darkMode: 'class'
 };

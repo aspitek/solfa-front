@@ -1,0 +1,19 @@
+
+@use './colors';
+@import './base.css';
+
+
+#app {
+    min-height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    background-color: colors.$color-background;
+}
+
+
+.pi-fileupload {
+    height: 100%;
+    border: 1px solid green;
+}

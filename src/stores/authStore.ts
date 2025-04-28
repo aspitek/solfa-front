@@ -1,82 +1,70 @@
 // src/stores/auth.ts
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import axios, { AxiosError } from 'axios';
-import type { Router } from 'vue-router';
+import container from '@/container/inversify.config';
+import type { IApiService } from '@/services/ApiService';
+import type { LoginCredentials, RegisterPayload } from '@/types/interfaces';
+import { UnauthorizedException } from '@/exceptions/UnauthorizedException';
+import { HttpException } from '@/exceptions/HttpException';
+import { SYMBOLS } from '@/constants';
+import type { User } from '@/types/types';
 
-const svr = 'http://147.79.114.72:32040'
-
-declare module 'pinia' {
-    export interface PiniaCustomProperties {
-        $router: Router;
-    }
-}
-
-// Interface pour les données de login
-interface LoginCredentials {
-    email: string;
-    password: string;
-}
-
-// Interface pour l'état du store
-interface AuthState {
-    token: string | null;
-}
-
-export const useAuthStore = defineStore('auth', () => {
-    // État
-    const token = ref<AuthState['token']>(localStorage.getItem('token') || null);
-
-    // Getters
-    const isLoggedIn = computed(() => !!token.value);
-
-    // Actions
-    const login = async (credentials: LoginCredentials): Promise<boolean> => {
+export const useAuthStore = defineStore('auth', {
+    state: () => {
+        return {
+          _isLoggedIn: false,
+          user: null as User | null,
+          _apiService: container.get<IApiService>(SYMBOLS.IApiService),
+        }
+    },
+    getters: {
+        isLoggedIn: (state) => {
+            return state._isLoggedIn;
+        },
+    },
+    actions: {
+      async login (credentials: LoginCredentials): Promise<void> {
         try {
-            // Remplacez cette URL par celle de votre API FastAPI
-            const response = await axios.post<{ token: string }>(`${svr}/login`, {
-                email: credentials.email,
-                password: credentials.password,
-            });
-            token.value = response.data.token;
-            localStorage.setItem('token', token.value);
-            return true; // Indique que la connexion a réussi
+            await this._apiService.login(credentials);
         } catch (error) {
-            const axiosError = error as AxiosError;
-            console.error('Erreur lors de la connexion:', axiosError.message);
-            throw new Error('Échec de la connexion. Vérifiez vos identifiants.');
-        }
-    };
+            let message = 'service indisponible, reessayez plustard';
+            if (error instanceof UnauthorizedException) {
+                message = error.details;
+            } else if (error instanceof HttpException) {
+                message = error.details;
+            }
 
-    const logout = () => {
-        token.value = null;
-        localStorage.removeItem('token');
-        // Note : La redirection est gérée dans les composants ou les gardes de navigation
-    };
-
-    const checkAuth = async (): Promise<boolean> => {
-        if (!token.value) {
-            return false;
+            throw new Error(message);
         }
+      },
+      async register (payload: RegisterPayload): Promise<void> {
         try {
-            // Vérifier si le token est valide (optionnel, selon votre API)
-            await axios.get(`${svr}/certify`, {
-                headers: {
-                    Authorization: `Bearer ${token.value}`,
-                },
-            });
-            return true;
+            await this._apiService.register(payload);
+            this.login(payload);
         } catch (error) {
-            logout(); // Déconnecter si le token est invalide
-            return false;
-        }
-    };
+            let message = 'service indisponible, reessayez plustard';
 
-    return { token, isLoggedIn, login, logout, checkAuth };
+            if (error instanceof HttpException) {
+                console.error("Erreur HTTP :", error.statusCode, error.message);
+                message = error.message;
+            }
+
+            throw new Error(message);
+        }
+    },
+    async logout(): Promise<void> {
+        await this._apiService.logout();
+        this._isLoggedIn = false;
+        this.user = null;
+    },
+
+    async checkAuth(): Promise<void> {
+        try {
+            this.user = await this._apiService.checkAuth();
+            this._isLoggedIn = true;
+        } catch {
+            this._isLoggedIn = false;
+            this.user = null;
+        }
+    },
+  },
 });
-
-// Ajouter une propriété router au store pour l'utiliser dans les actions
-export function setupAuthStoreRouter(router: Router) {
-    const authStore = useAuthStore();
-    authStore.$router = router;
-}

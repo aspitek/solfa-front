@@ -1,45 +1,18 @@
 <!-- src/App.vue -->
 <template>
-  <div class="app">
+  <div class="flex flex-col flex-1 ">
+    <Toast />
     <Navbar/>
-    <router-view />
+    <div class="flex flex-1 lg:px-6 2xl:px-12">
+      <router-view />
+    </div>
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import Navbar from './components/NavBar.vue';
+import Toast from 'primevue/toast';
 
-export default {
-  name: 'App',
-  components: {
-    Navbar,
-  },
-};
+localStorage.theme = 'light';
+
 </script>
-
-<style>
-/* Réinitialisation globale pour éviter les marges et barres de défilement */
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-}
-
-#app {
-  height: 100vh;
-  width: 100vw;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.app {
-  height: 100vh;
-  width: 100vw;
-  display: flex;
-  flex-direction: column;
-}
-</style>

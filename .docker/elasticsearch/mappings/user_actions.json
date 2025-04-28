@@ -1,0 +1,40 @@
+{
+    "mappings" : {
+        "properties" : {
+            "action" : {
+                "type" : "text",
+                "fields" : {
+                        "keyword" : {
+                        "type" : "keyword",
+                        "ignore_above" : 256
+                    }
+                }
+            },
+            "email" : {
+                "type" : "text",
+                "fields" : {
+                        "keyword" : {
+                        "type" : "keyword",
+                        "ignore_above" : 256
+                    }
+                }
+            },
+            "timestamp" : {
+                "type" : "date"
+            }
+        }
+    },
+    "settings" : {
+        "index" : {
+            "routing" : {
+                "allocation" : {
+                    "include" : {
+                        "_tier_preference" : "data_content"
+                    }
+                }
+            },
+            "number_of_shards" : "1",
+            "number_of_replicas" : "1"
+        }
+    }
+}

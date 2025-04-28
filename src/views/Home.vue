@@ -1,27 +1,18 @@
 <template>
-  <div class="home-search" :class="{ 'has-results': results.length }">
-    <div class="content-wrapper">
-      <Logo />
+  <div class="flex-1 flex flex-col items-center">
+    <div class="w-[90vw] sm:w-[50vw] flex flex-col items-center mt-5">
+      <!-- <Logo /> -->
       <SearchForm @search-results="handleSearchResults" />
-      <div v-if="results.length" class="results-dropdown">
-        <div class="results-container">
-          <div class="result-card" v-for="(result, index) in results" :key="index">
-            <h3>{{ result._source.title }}</h3>
-            <p><strong>Compositeur :</strong> {{ result._source.composer || 'Inconnu' }}</p>
-            <p><strong>Catégorie :</strong> {{ result._source.category || 'Non spécifiée' }}</p>
-            <p><strong>Genre :</strong> {{ result._source.genre || 'Non spécifié' }}</p>
-            <p><strong>Date de sortie :</strong> {{ formatDate(result._source.release_date) }}</p>
-            <div class="action-buttons">
-              <button @click="downloadPartition(result._source.path, result._source.title)" class="download-button">
-                Télécharger
-              </button>
-              <button @click="deletePartition(result._source.id, index)" class="delete-button">
-                Supprimer
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+    </div>
+    <div
+      v-if="results.length"
+      class="flex flex-col mt-5 gap-3"
+    >
+      <ResultCard
+        v-for="(result, index) in results"
+        :key="index"
+        :result="result"
+      />
     </div>
   </div>
 </template>
@@ -31,6 +22,7 @@ import SearchForm from '../components/SearchForm.vue';
 import Logo from '../components/Logo.vue';
 import { useSearchStore } from '../stores/searchStore';
 import { useAuthStore } from '../stores/authStore'; // Importer le store d'authentification
+import ResultCard from '@/components/ResultCard.vue';
 
 interface SearchResult {
   _id: string; // Ajouter _id pour identifier la partition
@@ -50,6 +42,7 @@ export default {
   components: {
     SearchForm,
     Logo,
+    ResultCard,
   },
   data() {
     return {
@@ -84,7 +77,7 @@ export default {
     },
     async downloadPartition(path: string, title: string) {
       try {
-        const downloadUrl = `http://147.79.114.72:32040/download?path=${encodeURIComponent(path)}`;
+        const downloadUrl = `http://localhost:8080/download?path=${encodeURIComponent(path)}`;
         const response = await fetch(downloadUrl, {
           method: 'GET',
           headers: {
@@ -132,7 +125,7 @@ export default {
         }
 
         // Envoyer une requête DELETE au backend
-        const deleteUrl = `http://147.79.114.72:32040/admin/delete/${id}`; // Ajuster l'URL selon votre API
+        const deleteUrl = `http://localhost:8080/admin/delete/${id}`; // Ajuster l'URL selon votre API
         const response = await fetch(deleteUrl, {
           method: 'DELETE',
           headers: {
@@ -163,32 +156,18 @@ export default {
 </script>
 
 <style scoped>
-.home-search {
-  position: relative;
-  min-height: 100vh;
-  width: 100vw;
-  background-color: #ffffff;
-  padding: 0;
-  box-sizing: border-box;
- 
-}
 
 .content-wrapper {
-  position: absolute;
-  top: 10%;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 90%;
   max-width: 600px;
   transition: top 0.5s ease-in-out;
-  
+
 }
 
 .results-dropdown {
-  position: absolute;
   top: 100%;
   width: 100%;
   max-width: 700px;
