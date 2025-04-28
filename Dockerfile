@@ -5,7 +5,7 @@ FROM node:22-alpine AS build
 WORKDIR /app
 
 # Copier les fichiers de gestion des dépendances
-COPY package.json package-lock.json ./
+COPY package.json ./
 
 # Installer les dépendances
 RUN npm install
