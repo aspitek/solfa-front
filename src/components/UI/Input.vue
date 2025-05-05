@@ -22,7 +22,9 @@
                 :invalid="!!$field.error"
                 :name="name"
                 :aria-describedby="`${name}-help`"
-                :placeholder="placeholder"
+                :placeholder
+                :autoComplete
+                :type
             />
             <slot name="right" />
         </InputGroup>
@@ -68,10 +70,6 @@ const { name } = defineProps({
         type: String,
         default: '',
     },
-    isPassword: {
-        type: Boolean,
-        default: false,
-    },
     disabled: {
         type: Boolean,
         default: false,
@@ -87,6 +85,10 @@ const { name } = defineProps({
     inputClass: {
         type: String,
         default: '',
+    },
+    autoComplete: {
+        type: String,
+        default: 'on',
     },
 })
 

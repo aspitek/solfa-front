@@ -35,19 +35,22 @@ export class HttpService implements IHttpService {
     return response.data;
   }
 
-
   private setupInterceptors() {
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       (error: AxiosError) => {
         console.error(error)
         const status = error.response?.status || 500;
-        const message = error.response?.data?.message
+        let message = error.response?.data?.message
           || error.response?.data?.error
           || error.message;
 
         if (status === 401) {
           return Promise.reject(new UnauthorizedException(message));
+        }
+
+        if (status >= 500) {
+          message = 'service indisponible, reessayez plustard';
         }
 
         return Promise.reject(

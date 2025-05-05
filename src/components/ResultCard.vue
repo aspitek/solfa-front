@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-white min-w-[30rem] rounded-md shadow-sm px-4 py-5 flex flex-col gap-2">
+    <div class="bg-white w-full rounded-md shadow-sm px-4 py-5 flex flex-col gap-2">
       <h3 class="uppercase">{{ result._source.title }}</h3>
       <p><strong>Compositeur :</strong> {{ result._source.composer || 'Inconnu' }}</p>
       <p><strong>Catégorie :</strong> {{ result._source.category || 'Non spécifiée' }}</p>
@@ -26,20 +26,8 @@ import Button from './UI/Button.vue';
 import { PrimeIcons } from '@primevue/core/api';
 import { useAuthStore } from '../stores/authStore';
 import { storeToRefs } from 'pinia';
+import type { SearchResult } from '@/types/interfaces';
 
-
-interface SearchResult {
-  _id: string; // Ajouter _id pour identifier la partition
-  _source: {
-    title: string;
-    composer: string;
-    category: string;
-    genre: string;
-    release_date: string;
-    path: string;
-    id: string;
-  }
-};
 
 const {result} = defineProps<{result: SearchResult}>();
 

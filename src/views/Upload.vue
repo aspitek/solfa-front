@@ -16,7 +16,7 @@
                     </div>
                     <Form
                       v-slot="{loading}"
-                      class="w-full h-full grid grid-cols-6 items-center"
+                      class="w-full h-full grid grid-cols-6 gap-x-2 items-center"
                       :initialValues
                       :schema="createPartitionSchema"
                       @submit="handleUpload"
@@ -64,7 +64,7 @@
                         name="genre"
                         label="Genre"
                         id="genre"
-                        :options="partitionGenders"
+                        :options="PARTITION_GENDERS"
                         optionLabel="label"
                         class="col-span-full sm:col-span-3"
                       />
@@ -72,7 +72,7 @@
                         name="category"
                         label="Catégorie"
                         id="category"
-                        :options="partitionCategories"
+                        :options="PARTITION_CATEGORIES"
                         optionLabel="label"
                         class="col-span-full sm:col-span-3"
                       />
@@ -108,7 +108,7 @@ import DatePicker from 'primevue/datepicker';
 import { createPartitionSchema } from '@/schemas/partition';
 import container from '@/container/inversify.config';
 import type { IApiService } from '@/services/ApiService';
-import { SYMBOLS } from '@/constants';
+import { PARTITION_CATEGORIES, PARTITION_GENDERS, SYMBOLS } from '@/constants';
 import { FormField } from '@primevue/forms';
 import { useToast } from 'primevue/usetoast';
 
@@ -124,43 +124,6 @@ import { useToast } from 'primevue/usetoast';
         category: '',
         releaseDate: '',
     };
-
-    const partitionGenders = [
-      { label: "Classique", value: "Classique" },
-      { label: "Liturgique", value: "Liturgique" },
-      { label: "Recueil de chant", value: "Recueil de chant" },
-      { label: "Animation | 4/4", value: "Animation | 4/4" },
-      { label: "Gbegbe", value: "Gbegbe" },
-      { label: "Apkongbô", value: "Apkongbô" },
-      { label: "Gospel", value: "Gospel" },
-      { label: "6/8", value: "6/8" },
-      { label: "Traditionnel", value: "Traditionnel" },
-      { label: "Hymne", value: "Hymne" },
-      { label: "Highlife", value: "Highlife" },
-      { label: "Agbadja", value: "Agbadja" },
-      { label: "Abodan", value: "Abodan" },
-      { label: "6/8 Ghana", value: "6/8 Ghana" },
-      { label: "Mandingue", value: "Mandingue" },
-      { label: "Autre", value: "Autre" },
-    ];
-
-    const partitionCategories = [
-      { label: "Offertoire", value: "Offertoire" },
-      { label: "Ordinaire", value: "Ordinaire" },
-      { label: "PU", value: "PU" },
-      { label: "Action de grâce", value: "Action de grâce" },
-      { label: "Antienne d'ouverture", value: "Antienne d'ouverture" },
-      { label: "Communion | Sainte Cène", value: "Communion | Sainte Cène" },
-      { label: "Psaume", value: "Psaume" },
-      { label: "Méditation", value: "Méditation" },
-      { label: "Animation", value: "Animation" },
-      { label: "Quête", value: "Quête" },
-      { label: "Acclamation", value: "Acclamation" },
-      { label: "Requiem", value: "Requiem" },
-      { label: "Sacrement", value: "Sacrement" },
-      { label: "Carême", value: "Carême" },
-      { label: "Autre", value: "Autre" },
-    ];
 
     const handleFileChange = (file: File) => {
       partitionFile.value = file;

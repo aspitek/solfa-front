@@ -1,95 +1,138 @@
 <template>
-    <form @submit.prevent="handleSearch" class="w-full search-form rounded-xl">
-      <InputGroup class="w-full rounded-lg">
-        <InputText
-          name="search"
-          v-model="query"
-          @input="onInputChange"
-          type="text"
-          placeholder="Rechercher..."
-          class="h-16 rounded-xl"
-        />
-        <Button
-          type="submit"
-          icon="pi pi-search"
-          label="Rechercher"
-        />
-      </InputGroup>
+    <form @submit.prevent="handleSearch" class="w-full flex flex-col items-center gap-3">
+      <div ref="search-container" class="relative w-[50vw]">
+        <InputGroup class="w-full">
+          <InputText
+            name="search"
+            v-model.trim="query"
+            type="text"
+            placeholder="Rechercher..."
+            class="h-16 rounded-xl"
+            @focus="showSuggestions = true"
+            autoComplete="off"
+          />
+          <Button
+            type="submit"
+            icon="pi pi-search"
+            label="Rechercher"
+          />
+        </InputGroup>
+        <ul
+          v-if="showSuggestions && filteredSuggestions.length"
+          class="absolute w-full flex flex-col gap-2 mt-2 bg-white rounded-xl shadow-sm min-h-[2rem] py-5 px-4"
+        >
+          <li
+            v-for="(suggestion, index) in filteredSuggestions"
+            :key="index"
+            @click="selectSuggestion(suggestion)"
+          >
+            {{ suggestion._source.title }} de {{ suggestion._source.composer }}
+          </li>
+        </ul>
+      </div>
+      <ul class="flex flex-wrap justify-center">
+        <li
+          v-for="(query, _) in quickQueries"
+          :key="_"
+        >
+          <Chip
+            :label="query.label"
+            class="m-1 cursor-pointer"
+            :class="[{'bg-primary-200 text-white': queryFilters.includes(query.value)}]"
+            @click="toggleQueryFilter(query.value)"
+          />
+        </li>
+      </ul>
     </form>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { computed, onMounted, ref, useTemplateRef } from 'vue';
 import { useSearchStore } from '../stores/searchStore';
 import Button from '@/components/UI/Button.vue';
-import { InputGroup, InputText } from 'primevue';
+import { InputGroup, InputText, Chip } from 'primevue';
+import { PARTITION_GENDERS } from '@/constants';
+import { watchEffect } from 'vue';
+import { onBeforeUnmount } from 'vue';
+import type { SearchResult } from '@/types/interfaces';
+import router, { route, RouteName } from '@/router';
 
-export default defineComponent({
-    name: 'SearchForm',
-    components: {
-        Button,
-        InputText,
-        InputGroup
-    },
-    data() {
-        return {
-            query: '',
-            debounceTimeout: undefined as number | undefined, // Variable pour gérer le timeout
-        };
-    },
-    methods: {
-        // Méthode pour la recherche lorsque le formulaire est soumis
-        handleSearch() {
-            if (this.query.trim()) {
-                const searchStore = useSearchStore();
-                searchStore.fetchResults(this.query);
-            }
-        },
+const quickQueries = [
+  ...PARTITION_GENDERS,
+]
 
-        // Méthode appelée à chaque changement de l'input
-        onInputChange() {
-            // Annuler le précédent timeout si l'utilisateur tape rapidement
-            if (this.debounceTimeout !== undefined) {
-                clearTimeout(this.debounceTimeout);
-            }
+const searchStore = useSearchStore();
 
-            if (this.query.trim()) {
-                // Délai avant d'envoyer la requête
-                this.debounceTimeout = setTimeout(() => {
-                    const searchStore = useSearchStore();
-                    // Vérifier à nouveau si query est non vide avant d'envoyer la requête
-                    if (this.query.trim()) {
-                        searchStore.fetchResults(this.query);
-                    }
-                }, 500); // Délai de 500 ms avant d'envoyer la requête
-            } else {
-                // Si l'input est vide, vider les résultats immédiatement
-                const searchStore = useSearchStore();
-                searchStore.clearResults();
-            }
-        },
-    },
+const searchRef = useTemplateRef('search-container');
+const showSuggestions = ref(false);
+const query = ref<string>('');
+const debounceTimeout = ref<number | undefined>(undefined);
+const queryFilters = ref<string[]>([]);
+
+const filteredSuggestions = computed(() => {
+  return searchStore.results
 });
-</script>
 
-<style scoped lang="scss">
-.search-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
+const toggleQueryFilter = (query: string) => {
+  const index = queryFilters.value.indexOf(query);
+  if (index === -1) {
+    queryFilters.value.push(query);
+  } else {
+    queryFilters.value.splice(index, 1);
+  }
+}
 
-    .p-inputtext {
-
+const handleSearch = () => {
+  router.push(route(RouteName.Search, {
+    query: {
+      keywords: [
+        query.value,
+        ...queryFilters.value
+      ]
     }
+  }));
 }
 
+const onQueryChange = (keywords: string[]) => {
+  if (debounceTimeout.value !== undefined) {
+    clearTimeout(debounceTimeout.value);
+  }
 
-.search-input:focus {
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+  if (!keywords.length) {
+    searchStore.clearResults();
+  }
+
+  debounceTimeout.value = setTimeout(() => {
+    searchStore.fetchResults([
+      query.value,
+      ...queryFilters.value
+    ]);
+  }, 500);
 }
 
-.search-button:hover {
-    background-color: #c1351f;
-}
-</style>
+const selectSuggestion = (suggestion: SearchResult) => {
+  showSuggestions.value = false;
+};
+
+const handleClickOutside = (event: MouseEvent) => {
+  if (searchRef.value && !searchRef.value.contains(event.target)) {
+    showSuggestions.value = false;
+  }
+};
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
+
+watchEffect(() => {
+  onQueryChange([
+    query.value,
+    ...queryFilters.value
+  ]);
+})
+
+</script>

@@ -5,12 +5,14 @@ import Login from '@/views/Login.vue';
 import Upload from '@/views/Upload.vue';
 import { useAuthStore } from '../stores/authStore';
 import Register from '@/views/Register.vue';
+import Search from '@/views/Search.vue';
 
 export enum RouteName {
   Home = 'Home',
   Login = 'Login',
   Register = 'Register',
   Upload = 'Upload',
+  Search = 'Search',
 }
 
 export type RouteParams = {
@@ -18,6 +20,7 @@ export type RouteParams = {
   [RouteName.Login]: undefined;
   [RouteName.Register]: undefined;
   [RouteName.Upload]: undefined;
+  [RouteName.Search]: { query: {keywords: string[]}};
 };
 
 const GUEST_ONLY_ROUTES = [
@@ -62,6 +65,11 @@ const routes: RouteRecordRaw[] = [
     component: Upload,
     meta: { requiresAuth: true },
   },
+  {
+    path: '/search',
+    name: RouteName.Search,
+    component: Search,
+  },
 ];
 
 const router = createRouter({
@@ -87,7 +95,10 @@ export function route<Name extends RouteName>(
   name: Name,
   params?: RouteParams[Name]
 ) {
-  return router.resolve({ name, params }).href;
+  return router.resolve({
+    name,
+    ...params,
+  }).href;
 }
 
 export default router;

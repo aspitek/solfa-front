@@ -3,7 +3,7 @@
   <div class="flex flex-col flex-1 ">
     <Toast />
     <Navbar/>
-    <div class="flex flex-1 lg:px-6 2xl:px-12">
+    <div class="flex w-screen main-container flex-1 lg:px-6 2xl:px-12">
       <router-view />
     </div>
   </div>

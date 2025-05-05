@@ -1,27 +1,25 @@
 <template>
   <div class="flex-1 flex flex-col items-center">
-    <div class="w-[90vw] sm:w-[50vw] flex flex-col items-center mt-5">
+    <div class="w-[90vw] flex flex-col items-center mt-5 justify-between">
+      <div class="flex flex-col items-center mb-5">
+        <h1 class="text-2xl font-bold text-center mb-4">SOLFA</h1>
+        <p class="text-lg text-center mb-4">
+          Bienvenue sur SOLFA, la plateforme de partage de partitions musicales.
+          <br />
+          Recherchez, téléchargez et partagez vos partitions préférées.
+          <br />
+        </p>
+      </div>
       <!-- <Logo /> -->
-      <SearchForm @search-results="handleSearchResults" />
-    </div>
-    <div
-      v-if="results.length"
-      class="flex flex-col mt-5 gap-3"
-    >
-      <ResultCard
-        v-for="(result, index) in results"
-        :key="index"
-        :result="result"
-      />
+      <SearchForm @search-results="handleSearchResults"/>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import SearchForm from '../components/SearchForm.vue';
-import Logo from '../components/Logo.vue';
 import { useSearchStore } from '../stores/searchStore';
-import { useAuthStore } from '../stores/authStore'; // Importer le store d'authentification
+import { useAuthStore } from '../stores/authStore';
 import ResultCard from '@/components/ResultCard.vue';
 
 interface SearchResult {
@@ -41,12 +39,11 @@ export default {
   name: 'HomeSearch',
   components: {
     SearchForm,
-    Logo,
     ResultCard,
   },
   data() {
     return {
-      results: [] as SearchResult[], // Spécifier le type ici
+      results: [] as SearchResult[],
     };
   },
   computed: {
@@ -74,42 +71,6 @@ export default {
         month: 'long',
         day: 'numeric',
       });
-    },
-    async downloadPartition(path: string, title: string) {
-      try {
-        const downloadUrl = `http://localhost:8080/download?path=${encodeURIComponent(path)}`;
-        const response = await fetch(downloadUrl, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/pdf',
-          },
-        });
-
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error('Fichier non trouvé dans MinIO');
-          } else if (response.status === 400) {
-            throw new Error('Requête invalide : chemin manquant');
-          } else {
-            throw new Error('Erreur lors du téléchargement de la partition');
-          }
-        }
-
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${title}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-
-        console.log(`Partition ${title} téléchargée avec succès`);
-      } catch (error: unknown) {
-        console.error('Erreur lors du téléchargement :', error);
-        alert((error as Error).message || 'Impossible de télécharger la partition. Veuillez réessayer plus tard.');
-      }
     },
     async deletePartition(id: string, index: number) {
       // Demander une confirmation avant de supprimer

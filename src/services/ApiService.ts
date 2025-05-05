@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import type { IHttpService } from "./HttpService";
-import type { LoginCredentials, RegisterPayload, CreatePartitionPayload } from "@/types/interfaces";
+import type { LoginCredentials, RegisterPayload, CreatePartitionPayload, SearchResult } from "@/types/interfaces";
 import { SYMBOLS } from "@/constants";
 import type { User } from "@/types/types";
 
@@ -11,6 +11,7 @@ export interface IApiService {
     checkAuth(): Promise<User>;
     register(payload: RegisterPayload): Promise<void>;
     createPartition(payload: CreatePartitionPayload): Promise<void>;
+    searchPartitions(keywords: string[]): Promise<{results: SearchResult[]}>;
 }
 
 @injectable()
@@ -43,7 +44,7 @@ export class ApiService implements IApiService {
     }
 
     async logout(): Promise<void> {
-      return await this.httpService.post<void>("/logout");
+      return await this.httpService.get<void>("/revoke");
     }
 
     async register(payload: RegisterPayload): Promise<void> {
@@ -54,5 +55,13 @@ export class ApiService implements IApiService {
         const {user} = await this.httpService.get<{user: User}>(`certify`);
 
         return user;
+    }
+
+    async searchPartitions(keywords: string[]): Promise<{results: SearchResult[]}> {
+      return await this.httpService.get<{results: SearchResult[]}>("/search", {
+        params: {
+          q: encodeURIComponent(keywords.join(","))
+        }
+      });
     }
 }

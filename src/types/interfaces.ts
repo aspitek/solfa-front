@@ -23,3 +23,16 @@ export interface CreatePartitionPayload {
   category: string;
   release_date?: Date;
 }
+
+export interface SearchResult {
+  _id: string; // Ajouter _id pour identifier la partition
+  _source: {
+    title: string;
+    composer: string;
+    category: string;
+    genre: string;
+    release_date: string;
+    path: string;
+    id: string;
+  }
+}
