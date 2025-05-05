@@ -18,7 +18,7 @@
           />
         </InputGroup>
         <ul
-          v-if="showSuggestions && filteredSuggestions.length"
+          v-if="showSuggestions && filteredSuggestions?.length"
           class="absolute w-full flex flex-col gap-2 mt-2 bg-white rounded-xl shadow-sm min-h-[2rem] py-5 px-4"
         >
           <li
@@ -112,6 +112,7 @@ const onQueryChange = (keywords: string[]) => {
 
 const selectSuggestion = (suggestion: SearchResult) => {
   showSuggestions.value = false;
+  query.value = suggestion._source.title;
 };
 
 const handleClickOutside = (event: MouseEvent) => {
