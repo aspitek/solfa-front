@@ -13,6 +13,7 @@ RUN npm install
 # Copier le reste des fichiers de l'application
 COPY . .
 
+ENV VITE_API_BASE_URL=http://147.79.114.72:32040
 # Construire l'application pour la production
 RUN npm run build-only
 
