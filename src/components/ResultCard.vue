@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-white w-full rounded-md shadow-sm px-4 py-5 flex flex-col gap-2">
+    <div class="bg-white w-full rounded-lg shadow-md px-4 py-5 flex flex-col gap-2">
       <h3 class="uppercase">{{ result._source.title }}</h3>
       <p><strong>Compositeur :</strong> {{ result._source.composer || 'Inconnu' }}</p>
       <p><strong>Catégorie :</strong> {{ result._source.category || 'Non spécifiée' }}</p>

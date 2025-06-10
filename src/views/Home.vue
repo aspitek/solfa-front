@@ -1,7 +1,7 @@
 <template>
   <div class="flex-1 flex flex-col items-center">
-    <div class="w-[90vw] flex flex-col items-center mt-5 justify-between">
-      <div class="flex flex-col items-center mb-5">
+    <div class="w-full px-2 sm:px-5 flex flex-col items-center mt-5 justify-between">
+      <div class="hidden sm:flex flex-col items-center mb-5">
         <h1 class="text-2xl font-bold text-center mb-4">SOLFA</h1>
         <p class="text-lg text-center mb-4">
           Bienvenue sur SOLFA, la plateforme de partage de partitions musicales.

@@ -1,6 +1,6 @@
 <template>
     <form @submit.prevent="handleSearch" class="w-full flex flex-col items-center gap-3">
-      <div ref="search-container" class="relative w-[50vw]">
+      <div ref="search-container" class="relative w-full sm:w-[50vw]">
         <InputGroup class="w-full">
           <InputText
             name="search"

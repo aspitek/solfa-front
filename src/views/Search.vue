@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col flex-1 pb-5">
+  <div class="flex flex-col flex-1 sm:pb-5">
     <div class="p-4">
       <h1 class="text-xl font-bold mb-4">Résultats de recherche : {{searchText}}</h1>
       <div v-if="keywords?.length">
@@ -16,10 +16,10 @@
       layout="grid"
       :value="searchStore.results"
       dataKey="id"
-      class="flex flex-col mt-5 gap-3 py-5 px-4 rounded-lg shadow-md bg-white"
+      class="flex flex-1 flex-col sm:justify-center mt-5 gap-3 py-5 px-4 rounded-lg shadow-md bg-white"
     >
       <template #grid="slotProps">
-        <div class="grid grid-cols-3 gap-4">
+        <div class="flex flex-col sm:grid grid-cols-3 gap-4">
           <div
             v-for="(item, index) in slotProps.items"
             :key="index"
@@ -30,6 +30,12 @@
               :key="index"
             />
           </div>
+        </div>
+      </template>
+      <template #empty>
+        <div class="flex border items-center justify-center">
+          <i class="pi pi-search text-5xl text-gray-400"></i>
+          <p class="text-gray-400">Aucun résultat trouvé.</p>
         </div>
       </template>
     </DataView>
